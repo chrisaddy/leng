@@ -1,6 +1,8 @@
 import gradio as gr
 import wikipedia
 import requests
+from google_images_search import GoogleImagesSearch
+
 
 wikipedia.set_lang("es")
 wikipedia.set_lang("fr")
@@ -32,8 +34,8 @@ with gr.Blocks() as app:
         output = gr.Textbox(label="output")
         with gr.Row():
             definition = gr.Textbox(label="definition")
-
-        define = gr.Button("define")
+            definition_output = gr.Textbox(label="definition")
+            define = gr.Button("define")
 
 
     submit.click(load_results, wiki, output)
