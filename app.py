@@ -1,24 +1,35 @@
 import gradio as gr
 import wikipedia
 import requests
-from google_images_search import GoogleImagesSearch
 import os
 from scraper_api import ScraperAPIClient
+import emoji
 
 
-SCRAPER_API_KEY = os.getenv("SCRAPER_API")
+SCRAPER_API_KEY = os.getenv("SCRAPER_API_KEY")
 
 
-def set_lang(lang):
-    wikipedia.set_lang("es")
-    wikipedia.set_lang("fr")
+
+def load_results_chinese(query):
+
     wikipedia.set_lang("zh")
-    
-    print("yo")
-    print(lang)
+    # search = wikipedia.search(query)
+    page = wikipedia.page(title=query)
+
+    return page.content
 
 
-def load_results(query):
+def load_results_spanish(query):
+
+    wikipedia.set_lang("es")
+    # search = wikipedia.search(query)
+    page = wikipedia.page(title=query)
+
+    return page.content
+
+
+def load_results_french(query):
+    wikipedia.set_lang("fr")
 
     # search = wikipedia.search(query)
     page = wikipedia.page(title=query)
@@ -26,26 +37,36 @@ def load_results(query):
     return page.content
 
 
-def load_images(query):
-    client = ScraperAPIClient('APIKEY')
-    url = "https://www.google.com/search?lang=zn&tbm=isch&q=%E5%85%8B"
-    result = client.get(url = url).text
+
+def load_results_japanese(query):
+
+    # search = wikipedia.search(query)
+    page = wikipedia.page(title=query)
+
+    return page.content
+
+
+def load_definition(query):
+    client = ScraperAPIClient(SCRAPER_API_KEY)
+    url = f"https://www.google.com/search?lang=es&tbm=isch&q={query}"
+    result = client.get(url = url)
+    print(result.json())
     return result
 
 
-with gr.Blocks() as app:
-    language = gr.Radio(["中文", "English", "Español", "日本語"])
-    print(dir(language))
-    print(language.value)
 
-    language.change(set_lang, language.value)
-    
+
+with gr.Blocks() as app:
     with gr.Row():
         wiki = gr.Textbox(label="wiki search")
         url = gr.Textbox(label="url")
         plain_text = gr.Textbox(label="text")
 
-    submit = gr.Button("submit").style(full_width=True)
+    with gr.Row():
+        submit_chinese = gr.Button(emoji.emojize(":China:")).style(full_width=True)
+        submit_spanish = gr.Button(emoji.emojize(":Mexico:")).style(full_width=True)
+        submit_french = gr.Button(emoji.emojize(":France:")).style(full_width=True)
+        submit_japanese = gr.Button(emoji.emojize(":Japan:")).style(full_width=True)
 
 
     with gr.Row():
@@ -61,7 +82,11 @@ with gr.Blocks() as app:
             # picture = gr.
 
 
-    submit.click(load_results, wiki, output)
-    # define.click(load_definition, )
+    submit_spanish.click(load_results_spanish, wiki, output)
+    submit_chinese.click(load_results_chinese, wiki, output)
+    submit_french.click(load_results_french, wiki, output)
+    submit_japanese.click(load_results_japanese, wiki, output)
+
+    define.click(load_definition, definition)
 
 app.launch()
